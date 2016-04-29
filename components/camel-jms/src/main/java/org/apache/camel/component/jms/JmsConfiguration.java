@@ -133,6 +133,7 @@ public class JmsConfiguration implements Cloneable {
             description = "The number of messages per task. -1 is unlimited."
                     + " If you use a range for concurrent consumers (eg min < max), then this option can be used to set"
                     + " a value to eg 100 to control how fast the consumers will shrink when less work is required.")
+    
     private int maxMessagesPerTask = -1;
     private int cacheLevel = -1;
     @UriParam(defaultValue = "CACHE_AUTO", enums = "CACHE_AUTO,CACHE_CONNECTION,CACHE_CONSUMER,CACHE_NONE,CACHE_SESSION", label = "consumer",
@@ -172,6 +173,10 @@ public class JmsConfiguration implements Cloneable {
                     + " See also the maxMessagesPerTask option to control dynamic scaling up/down of threads."
                     + " When doing request/reply over JMS then the option replyToMaxConcurrentConsumers is used to control number"
                     + " of concurrent consumers on the reply message listener.")
+    @UriParam(defaultValue = "100", label = "advanced")
+    private long waitForProvisionCorrelationToBeUpdatedThreadSleepingTime = 100L;
+    @UriParam(defaultValue = "50", label = "advanced")
+    private int waitForProvisionCorrelationToBeUpdatedCounter = 50;
     private int maxConcurrentConsumers;
     @UriParam(label = "producer",
             description = "Specifies the maximum number of concurrent consumers when using request/reply over JMS."
@@ -1029,6 +1034,38 @@ public class JmsConfiguration implements Cloneable {
      */
     public void setIdleConsumerLimit(int idleConsumerLimit) {
         this.idleConsumerLimit = idleConsumerLimit;
+    }
+
+    /**
+     * Specifies the default number of concurrent consumers when doing request/reply over JMS.
+     * See also the maxMessagesPerTask option to control dynamic scaling up/down of threads.
+     */
+    public void setReplyToConcurrentConsumers(int replyToConcurrentConsumers) {
+        this.replyToConcurrentConsumers = replyToConcurrentConsumers;
+    }
+
+    /**
+     * Receives a counter that is used in conjunction with {@code waitForProvisionCorrelationToBeUpdatedThreadSleepingTime}
+     * @return waitForProvisionCorrelationToBeUpdatedCounter
+     */
+    public int getWaitForProvisionCorrelationToBeUpdatedCounter() {
+        return waitForProvisionCorrelationToBeUpdatedCounter;
+    }
+
+    /**
+     * Sets a counter that is used in conjunction with {@code waitForProvisionCorrelationToBeUpdatedThreadSleepingTime}
+     * @param counter
+     */
+    public void setWaitForProvisionCorrelationToBeUpdatedCounter(int counter) {
+        this.waitForProvisionCorrelationToBeUpdatedCounter = counter;
+    }
+
+    /**
+     * Gets the sleeping time of the Thread when waiting for provision correlation to be updated.
+     * @return
+     */
+    public long getWaitForProvisionCorrelationToBeUpdatedThreadSleepingTime() {
+        return waitForProvisionCorrelationToBeUpdatedThreadSleepingTime;
     }
 
     public int getMaxConcurrentConsumers() {
